@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Side of My Desk</title>
+<meta name="description" content="Side of My Desk sets up automation for small Episcopal parishes: the prayer list, Sunday handout, service email and vestry memo, drafted each week for your office to review.">
+<meta property="og:title" content="Side of My Desk">
+<meta property="og:description" content="Side of My Desk sets up automation for small Episcopal parishes: the prayer list, Sunday handout, service email and vestry memo, drafted each week for your office to review.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://parishes.sideofmydesk.com/">
+<link rel="canonical" href="https://parishes.sideofmydesk.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='6' fill='%232c6a4d'/%3E%3Crect x='4' y='15' width='20' height='3' rx='1.5' fill='%23fff'/%3E%3Crect x='14' y='6' width='8' height='9' rx='1' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+/* Layout: one calm reading column, a parish-office week as the spine, one sample draft set off as a printed page. */
+:root {
+  --bg: #f5f7f3;
+  --surface: #ffffff;
+  --ink: #1b2822;
+  --muted: #4c5a53;
+  --line: #d6ddd6;
+  --accent: #2c6a4d;        /* green of Ordinary Time */
+  --accent-soft: #e3eee7;
+  --on-accent: #ffffff;
+  --rubric: #a12f28;        /* prayer-book rubric red */
+  --paper: #fffdf8;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", P052, Georgia, serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.6rem;
+  --step-3: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111814; --surface: #18211c; --ink: #e6ede8; --muted: #a5b3ab; --line: #2b3831;
+    --accent: #7fc4a1; --accent-soft: #1d2e25; --on-accent: #0c1711; --rubric: #ec8c80; --paper: #1c2620;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111814; --surface: #18211c; --ink: #e6ede8; --muted: #a5b3ab; --line: #2b3831;
+  --accent: #7fc4a1; --accent-soft: #1d2e25; --on-accent: #0c1711; --rubric: #ec8c80; --paper: #1c2620;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap {
+  max-width: 68rem;
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.2; text-wrap: balance; margin: 0; }
+h1 { font-size: var(--step-3); letter-spacing: -0.01em; }
+h2 { font-size: var(--step-2); }
+h3 { font-size: var(--step-1); }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.eyebrow { font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.lede { font-size: var(--step-1); color: var(--muted); max-width: 38rem; }
+.skip { position: absolute; left: -999px; }
+.skip:focus { left: 16px; top: 16px; background: var(--surface); padding: 8px 12px; z-index: 5; }
+
+/* Header */
+.site-head { border-bottom: 1px solid var(--line); }
+.site-head .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; flex-wrap: wrap; }
+.mark { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-family: var(--font-display); font-size: var(--step-1); font-weight: 600; }
+.mark svg { flex: none; }
+.head-link { font-size: var(--step--1); font-weight: 600; }
+
+/* Hero */
+.hero .wrap { display: grid; gap: 40px; padding-block: 56px 64px; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; }
+.hero-copy { display: grid; gap: 20px; min-width: 0; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-top: 8px; }
+.btn {
+  display: inline-block; background: var(--accent); color: var(--on-accent); text-decoration: none;
+  font-weight: 600; padding: 13px 22px; border-radius: 999px; border: 0; font-size: var(--step-0); cursor: pointer;
+}
+.btn:hover { filter: brightness(1.08); }
+.fine { font-size: var(--step--1); color: var(--muted); }
+
+/* Sample draft, set like a printed handout */
+.draft {
+  background: var(--paper); border: 1px solid var(--line); border-radius: 4px;
+  box-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgba(20, 40, 30, 0.35);
+  padding: 28px 28px 24px; font-family: var(--font-display); min-width: 0;
+}
+.draft-tag { font-family: var(--font-body); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.draft h3 { font-size: var(--step-1); margin-top: 14px; }
+.draft .rubric { color: var(--rubric); font-style: italic; font-size: 0.95rem; margin-top: 10px; }
+.draft ul { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; }
+.draft li { padding-left: 14px; position: relative; }
+.draft li::before { content: ""; position: absolute; left: 0; top: 0.7em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+.draft .status { margin-top: 18px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--font-body); font-size: var(--step--1); color: var(--muted); }
+
+/* Sections */
+.band { border-top: 1px solid var(--line); }
+.band .wrap { padding-block: 64px; display: grid; gap: 32px; }
+.section-head { display: grid; gap: 10px; max-width: 42rem; }
+.section-head p { color: var(--muted); }
+
+.jobs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 28px 32px; margin: 0; padding: 0; list-style: none; }
+.jobs li { display: grid; gap: 6px; align-content: start; border-top: 2px solid var(--accent); padding-top: 14px; min-width: 0; }
+.jobs p { color: var(--muted); }
+
+.week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.week li { padding: 22px 20px; display: grid; gap: 6px; align-content: start; border-left: 1px solid var(--line); min-width: 0; }
+.week li:first-child { border-left: 0; }
+.day { font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.week p { color: var(--muted); font-size: 0.97rem; }
+
+.care { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 16px 40px; list-style: none; margin: 0; padding: 0; }
+.care li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; }
+.care svg { margin-top: 4px; color: var(--accent); }
+.care strong { display: block; }
+.care span { color: var(--muted); }
+
+.offer { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: stretch; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel.pilot { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.price { font-family: var(--font-display); font-size: var(--step-3); line-height: 1; font-variant-numeric: tabular-nums; }
+.price small { font-family: var(--font-body); font-size: var(--step--1); color: var(--muted); font-weight: 400; margin-left: 6px; }
+.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.checks li { padding-left: 26px; position: relative; }
+.checks li::before { content: ""; position: absolute; left: 2px; top: 0.45em; width: 12px; height: 7px; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg); }
+.plans { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.plans li { display: flex; justify-content: space-between; gap: 16px; padding-block: 12px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.plans li:first-child { border-top: 0; padding-top: 0; }
+.plans b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.plans span { color: var(--muted); font-size: 0.95rem; flex-basis: 100%; }
+
+.about { display: grid; grid-template-columns: minmax(0, 42rem); gap: 16px; }
+.about p { color: var(--ink); }
+
+.contact { background: var(--accent-soft); }
+.contact .wrap { justify-items: start; }
+.email-line { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.email { font-family: var(--font-display); font-size: var(--step-2); color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--accent); overflow-wrap: anywhere; }
+.copy { background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 8px 16px; font: inherit; font-size: var(--step--1); font-weight: 600; cursor: pointer; }
+
+.site-foot .wrap { padding-block: 28px 40px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-size: var(--step--1); color: var(--muted); }
+
+@media (max-width: 860px) {
+  .hero .wrap, .offer { grid-template-columns: minmax(0, 1fr); }
+  .hero .wrap { padding-block: 40px 48px; }
+  .week { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .week li:nth-child(3) { border-left: 0; }
+  .week li:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+@media (max-width: 480px) {
+  .week { grid-template-columns: minmax(0, 1fr); }
+  .week li { border-left: 0; }
+  .week li + li { border-top: 1px solid var(--line); }
+  .band .wrap { padding-block: 48px; }
+  .draft { padding: 22px 18px 18px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="Side of My Desk, home">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="2" y="15" width="24" height="3" rx="1.5" fill="currentColor"/><rect x="5" y="18" width="2.5" height="8" rx="1" fill="currentColor"/><rect x="20.5" y="18" width="2.5" height="8" rx="1" fill="currentColor"/><rect x="14" y="5" width="9" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 8.5h4M16.5 11.5h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Side of My Desk
+    </a>
+    <a class="head-link" href="mailto:ian@sideofmydesk.com?subject=A%20pilot%20for%20our%20parish">ian@sideofmydesk.com</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">For small Episcopal parishes</p>
+        <h1 id="hero-title">Sunday&rsquo;s paperwork, drafted and waiting by Thursday noon.</h1>
+        <p class="lede">I set up automation that turns this week&rsquo;s prayer requests and notices into the Sunday handout, the service email and the vestry memo. Your administrator reads, adjusts and sends. Nothing goes out on its own.</p>
+        <div class="cta-row">
+          <a class="btn" href="mailto:ian@sideofmydesk.com?subject=A%20pilot%20for%20our%20parish">Ask about a pilot</a>
+          <p class="fine">Or write to ian@sideofmydesk.com</p>
+        </div>
+      </div>
+
+      <figure class="draft" aria-label="Example of a draft prayer list, with placeholder names">
+        <div class="draft-tag"><span>Example draft</span><span>For review</span></div>
+        <h3>The Prayers of the People</h3>
+        <p class="rubric">The Leader and People pray responsively.</p>
+        <ul>
+          <li>For N. and N., recovering at home</li>
+          <li>For N., and for all who care for them</li>
+          <li>For the people of N. Parish, our companion church</li>
+          <li>For N., departed this life, and for those who mourn</li>
+        </ul>
+        <p class="status">Built from this week&rsquo;s requests. Two names from last month aged off the list. Waiting on the office to approve.</p>
+      </figure>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="jobs-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="jobs-title">What do I offer?</h2>
+        <p>I can automate most of the routine work in a parish office: the copying, pasting and checking that someone does every week, usually alone. Every parish runs its office differently, so each setup is built around your own templates, schedule and accounts. You pick the pieces you want.</p>
+      </div>
+      <ul class="jobs">
+        <li><h3>The prayer list</h3><p>Requests collected in one place, names added only with permission, and older entries aged off on the schedule you choose.</p></li>
+        <li><h3>The Sunday handout</h3><p>This week&rsquo;s readings, hymns, notices and prayers merged into your own handout layout, in regular and large print.</p></li>
+        <li><h3>The service email</h3><p>The same details sent to the parish list as a clean weekly email, drafted from the handout so the two always match.</p></li>
+        <li><h3>The recording link</h3><p>Last Sunday&rsquo;s Zoom or livestream recording trimmed, posted and linked in the next email.</p></li>
+        <li><h3>The vestry memo</h3><p>A short monthly finance summary drafted from your bookkeeping reports, for the treasurer to check.</p></li>
+        <li><h3>Your other routines</h3><p>Newsletters, calendar notices, volunteer reminders and other repeat tasks, set up to match how your parish already does them.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="week-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="week-title">How a week runs</h2>
+        <p>Your office keeps doing what it does now. The drafting moves off its plate.</p>
+      </div>
+      <ol class="week">
+        <li><span class="day">Through Wednesday</span><p>Requests, notices and hymn choices come in the way they do today: email, a form or a note from the rector.</p></li>
+        <li><span class="day">Thursday by noon</span><p>Drafts of the prayer list, the handout and the service email are ready in your office account.</p></li>
+        <li><span class="day">Thursday or Friday</span><p>Your administrator reviews them, makes any changes and sends or prints. The goal is about 15 minutes.</p></li>
+        <li><span class="day">Sunday</span><p>The handout is in the pews, and the email and recording link are already out.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="care-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="care-title">Careful with what people share</h2>
+        <p>A prayer list holds things people told the church in trust. It is set up with that in mind from the first day.</p>
+      </div>
+      <ul class="care">
+        <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><path d="M3 9.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><strong>Drafts only</strong><span>Nothing is sent, printed or posted until someone at the church approves it.</span></div></li>
+        <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><path d="M3 9.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><strong>Names with permission</strong><span>Health details stay general, children are not named, and names leave the list on schedule.</span></div></li>
+        <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><path d="M3 9.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><strong>Your accounts, your files</strong><span>It works in the church&rsquo;s own email and documents, with access limited to what the job needs.</span></div></li>
+        <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><path d="M3 9.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><strong>No lock-in</strong><span>After the pilot it is month to month. You can stop at any time.</span></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="offer-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="offer-title">Start with a 60-day pilot</h2>
+        <p>One workflow, set up for your parish, with a clear test of whether it is working.</p>
+      </div>
+      <div class="offer">
+        <div class="panel pilot">
+          <p class="eyebrow">Pilot</p>
+          <p class="price">$750<small>flat, for 60 days</small></p>
+          <ul class="checks">
+            <li>The prayer list and the Sunday handout, set up in your format</li>
+            <li>Success means drafts ready by Thursday noon for six weeks in a row, with about 15 minutes of review</li>
+            <li>Your office sends its inputs by Wednesday, and I keep fixing at no charge until it works</li>
+            <li>The full $750 counts toward setup if you continue</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <p class="eyebrow">After the pilot</p>
+          <p>If it&rsquo;s working, you choose a monthly plan sized to your parish and the work you want covered, from the weekly prayer list and handout up to the recording link and the vestry memo.</p>
+          <p>I quote the monthly price and any setup in writing before you decide. It runs month to month, and you can stop at any time.</p>
+          <p class="fine">Dioceses can arrange a shared template for their parishes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="about-title">
+    <div class="wrap about">
+      <h2 id="about-title">Who you would be working with</h2>
+      <p>I&rsquo;m Ian Michel, a software engineer with more than twenty years of experience, and I help run the weekly office work at a small Episcopal parish in Connecticut. I built this for my own parish to take the weekly copy-and-paste off our plate. Side of My Desk is how I now offer the same setup to other parishes.</p>
+      <p>I keep it small on purpose, so you deal with me directly from the first email to the last fix.</p>
+    </div>
+  </section>
+
+  <section class="band contact" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="contact-title">Tell me about your parish office</h2>
+        <p>Write a few lines about your week: who does the handout, how prayer requests come in, and what takes the longest. I&rsquo;ll reply myself.</p>
+      </div>
+      <div class="email-line">
+        <a class="email" id="email-address" href="mailto:ian@sideofmydesk.com?subject=A%20pilot%20for%20our%20parish">ian@sideofmydesk.com</a>
+        <button class="copy" id="copy-email" type="button">Copy address</button>
+      </div>
+      <p class="fine" id="copy-status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>&copy; 2026 Side of My Desk LLC, Connecticut</span>
+    <span>No tracking or cookies on this site.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var btn = document.getElementById('copy-email');
+  var status = document.getElementById('copy-status');
+  var address = 'ian@sideofmydesk.com';
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    function selectIt() {
+      var el = document.getElementById('email-address');
+      var range = document.createRange();
+      range.selectNodeContents(el);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      status.textContent = 'Address selected. Copy it with your keyboard or menu.';
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(address).then(function () {
+        status.textContent = 'Copied ian@sideofmydesk.com';
+      }, selectIt);
+    } else {
+      selectIt();
+    }
+  });
+})();
+</script>
+</body>
+</html>
